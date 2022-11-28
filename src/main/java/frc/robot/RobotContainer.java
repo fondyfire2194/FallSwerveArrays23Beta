@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
@@ -41,6 +42,7 @@ public class RobotContainer {
 
   final GamepadButtons codriver = new GamepadButtons(m_coDriverController, true);
 
+ 
   //temp controller for testing -matt
  // private PS4Controller m_ps4controller = new PS4Controller(1);
  // public PoseTelemetry pt = new PoseTelemetry();
@@ -54,7 +56,7 @@ public class RobotContainer {
 
     Pref.addMissing();
 
-    SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
+      SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 
       LiveWindow.disableAllTelemetry();
     // Configure the button bindings

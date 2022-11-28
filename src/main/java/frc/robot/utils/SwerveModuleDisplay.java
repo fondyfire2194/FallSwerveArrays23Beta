@@ -4,6 +4,11 @@
 
 package frc.robot.utils;
 
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import frc.robot.subsystems.DriveSubsystem;
@@ -14,16 +19,21 @@ public class SwerveModuleDisplay implements Sendable {
     private final DriveSubsystem m_drive;
 
     SendableBuilder builder;
+    
+
+   
 
     public SwerveModuleDisplay(DriveSubsystem drive) {
 
         m_drive = drive;
-    
+        
+        a.publish(mnull)
+        
+
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
-       builder.setSmartDashboardType("SwerveModules");
 
         builder.addBooleanProperty("m_fl_can_ok", m_drive.m_frontLeft::checkCAN, null);
         builder.addBooleanProperty("m_fl_turn_stopped", m_drive.m_frontLeft::turnIsStopped, null);

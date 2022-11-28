@@ -37,6 +37,8 @@ public class ShuffleboardContent {
                 x.addBoolean("TurnCAN" + abrev, () -> m_sm.turnMotorConnected)
                                 .withPosition(9, locationIndex);
 
+                
+
         }
 
         public static void initDriveShuffleboard(SwerveModuleSparkMax m_sm) {
