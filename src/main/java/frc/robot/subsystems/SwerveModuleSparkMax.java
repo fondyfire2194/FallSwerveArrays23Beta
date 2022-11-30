@@ -114,6 +114,8 @@ public class SwerveModuleSparkMax extends SubsystemBase {
       int cancoderCanChannel,
       boolean driveMotorReversed,
       boolean turningMotorReversed,
+      int pdpCDrivehannel,
+      int pdpTurnChannel,
       double turningEncoderOffset) {
 
     m_locationIndex = locationIndex;
