@@ -4,9 +4,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,17 +14,20 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OIConstants;
-
+import frc.robot.commands.Vision.SetDriverMode;
 import frc.robot.commands.swerve.JogDriveModule;
 import frc.robot.commands.swerve.JogTurnModule;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.VisionPoseEstimator;
 import frc.robot.utils.LEDControllerI2C;
 
 public class RobotContainer {
   // The robot's subsystems
   final DriveSubsystem m_drive = new DriveSubsystem();
+
+ public VisionPoseEstimator vpe = new VisionPoseEstimator();
 
   LEDControllerI2C lcI2;
 
@@ -42,10 +43,9 @@ public class RobotContainer {
 
   final GamepadButtons codriver = new GamepadButtons(m_coDriverController, true);
 
- 
-  //temp controller for testing -matt
- // private PS4Controller m_ps4controller = new PS4Controller(1);
- // public PoseTelemetry pt = new PoseTelemetry();
+  // temp controller for testing -matt
+  // private PS4Controller m_ps4controller = new PS4Controller(1);
+  // public PoseTelemetry pt = new PoseTelemetry();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -56,9 +56,9 @@ public class RobotContainer {
 
     Pref.addMissing();
 
-      SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
+    SmartDashboard.putData("Scheduler", CommandScheduler.getInstance());
 
-      LiveWindow.disableAllTelemetry();
+    LiveWindow.disableAllTelemetry();
     // Configure the button bindings
 
     m_fieldSim.initSim();
@@ -80,11 +80,15 @@ public class RobotContainer {
     // () -> -m_coDriverController.getRawAxis(0),
     // () -> -m_coDriverController.getRawAxis(4)));
     // m_drive.setDefaultCommand(
-    //     new SetSwerveDrive(
-    //         m_drive,
-    //         () -> m_ps4controller.getRawAxis(1),
-    //         () -> m_ps4controller.getRawAxis(0),
-    //         () -> m_ps4controller.getRawAxis(2)));
+    // new SetSwerveDrive(
+    // m_drive,
+    // () -> m_ps4controller.getRawAxis(1),
+    // () -> m_ps4controller.getRawAxis(0),
+    // () -> m_ps4controller.getRawAxis(2)));
+
+    SmartDashboard.putData("SetDriverMode", new SetDriverMode(vpe.m_cam, true));
+    SmartDashboard.putData("ResetDriverMode", new SetDriverMode(vpe.m_cam, false));
+    
     m_drive.setDefaultCommand(
         new SetSwerveDrive(
             m_drive,
@@ -134,19 +138,18 @@ public class RobotContainer {
 
   private void initializeAutoChooser() {
     m_autoChooser.setDefaultOption("Do Nothing", new WaitCommand(0));
-   
 
     SmartDashboard.putData("Auto Selector", m_autoChooser);
 
   }
 
   public void simulationPeriodic() {
- 
+
     m_fieldSim.periodic();
   }
 
   public void periodic() {
- m_fieldSim.periodic();
+    m_fieldSim.periodic();
   }
 
   public double getThrottle() {

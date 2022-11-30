@@ -79,8 +79,6 @@ public class SwerveModuleSparkMax extends SubsystemBase {
   private final int VEL_SLOT = 1;
   private final int SIM_SLOT = 2;
 
-  private final int SM_SLOT = 1;
-
   private int tuneOn;
   public double actualAngleDegrees;
 

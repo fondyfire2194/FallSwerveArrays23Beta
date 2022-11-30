@@ -101,7 +101,7 @@ public class DriveSubsystem extends SubsystemBase {
    * The numbers used
    * below are robot specific, and should be tuned.
    */
-  final SwerveDrivePoseEstimator<N7, N7, N5> m_poseEstimator = new SwerveDrivePoseEstimator<N7, N7, N5>(
+  public final SwerveDrivePoseEstimator<N7, N7, N5> m_poseEstimator = new SwerveDrivePoseEstimator<N7, N7, N5>(
       Nat.N7(),
       Nat.N7(),
       Nat.N5(),
@@ -232,10 +232,6 @@ public class DriveSubsystem extends SubsystemBase {
       positionStart = getEstimatedPose().getX();
 
     }
-
-  }
-
-  public void getVisionCorrection() {
 
   }
 

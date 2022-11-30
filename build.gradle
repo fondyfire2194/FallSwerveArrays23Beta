@@ -65,6 +65,8 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
+    implementation(group: 'edu.wpi.first.apriltags', name: 'apriltags-java', version: '2023.1.1-beta-4')
+
     testImplementation 'junit:junit:4.13.1'
 }
 
