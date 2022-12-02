@@ -4,33 +4,36 @@
 
 package frc.robot.commands.Vision;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.VisionPoseEstimator;
 
 /** Add your docs here. */
 // This is the private constructor that will be called once by getInstance() and
 // it
 // should instantiate anything that will be required by the class
-public class TargetThread {
-    private DriveSubsystem m_drive;
+public class TargetThread1 {
+
     private VisionPoseEstimator m_vpe;
-    private PhotonPipelineResult previousPipelineResult;
+
+    private PhotonCamera m_cam;
+
+    private int m_num;
+
     private int n;
+
     private Pose3d[] camPose = new Pose3d[3];
 
     private Pose3d[] targetPose = new Pose3d[3];
-
-    private Pose2d[] visionMeasurement = new Pose2d[2];
 
     public Transform3d[] camToTarget = new Transform3d[3];
 
@@ -38,14 +41,21 @@ public class TargetThread {
 
     public int numberTargets = 0;
 
-    private final int maxTargets = 3;
+    private final int maxTargets = 2;// ##0,1
+
+    double imageCaptureTime;
 
     int loopctr;
 
-    public TargetThread(DriveSubsystem drive, VisionPoseEstimator vpe) {
-        m_drive = drive;
+    List<PhotonTrackedTarget> tpr;
+
+    public TargetThread1(VisionPoseEstimator vpe, PhotonCamera cam, int num) {
         m_vpe = vpe;
-        Thread tagThread = new Thread(new Runnable() {
+        m_cam = cam;
+
+        m_num = num;
+
+        Thread tagThread1 = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -54,6 +64,7 @@ public class TargetThread {
                         execute();
 
                         Thread.sleep(100);
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -63,41 +74,48 @@ public class TargetThread {
 
         // Set up thread properties and start it off
 
-        tagThread.setPriority(Thread.MIN_PRIORITY);
-        tagThread.setName("AprilTagThread");
-        tagThread.start();
+        tagThread1.setPriority(Thread.NORM_PRIORITY);
+        tagThread1.setName("AprilTagThread 1");
+        tagThread1.start();
 
     }
 
     public void execute() {
         // Update pose estimator with visible targets,
-        
-        SmartDashboard.putNumber("LPCTE ", loopctr++);
-        var pipelineResult = m_vpe.m_cam.getLatestResult();
 
-        SmartDashboard.putBoolean("HAS TARGETS", pipelineResult.hasTargets());
+        SmartDashboard.putNumber("LPCTT1 ", loopctr++);// thread running indicator
 
-        if (!pipelineResult.equals(previousPipelineResult) &&
+        var pipelineResult = m_cam.getLatestResult();
 
-                pipelineResult.hasTargets()) {
+        SmartDashboard.putBoolean("HAS TARGETS 1", pipelineResult.hasTargets());
 
-            previousPipelineResult = pipelineResult;
+        if (!pipelineResult.hasTargets())
+
+        {
+
+            numberTargets = 0;
+
+            imageCaptureTime = 0;
+
+        } else {
 
             numberTargets = pipelineResult.targets.size();
 
-            double imageCaptureTime = pipelineResult.getLatencyMillis() / 1000d;
+            imageCaptureTime = pipelineResult.getLatencyMillis() / 1000d;
 
-            SmartDashboard.putNumber("ImCap mSec", imageCaptureTime);
+            tpr = pipelineResult.targets;
 
-            SmartDashboard.putNumber("#TargetsSeen", numberTargets);
+            if (numberTargets > maxTargets)
+
+                tpr = pipelineResult.getTargets().subList(0, maxTargets);
 
             n = 0;
 
-            for (PhotonTrackedTarget target : pipelineResult.getTargets()) {
+            for (PhotonTrackedTarget target : tpr) {
 
                 fiducialId[n] = target.getFiducialId();
 
-                SmartDashboard.putNumber("FidID " + String.valueOf(n), fiducialId[n]);
+                SmartDashboard.putNumber("FidID 1 " + String.valueOf(n), fiducialId[n]);
 
                 Optional<Pose3d> temp = m_vpe.m_fieldLayout.getTagPose(fiducialId[n]);
 
@@ -113,16 +131,16 @@ public class TargetThread {
 
                 camPose[n] = targetPose[n].transformBy(camToTarget[n].inverse());
 
-                visionMeasurement[n] = camPose[n].transformBy(m_vpe.CAMERA_TO_ROBOT_3D).toPose2d();
+                m_vpe.setVisionCorrectionData(1, n,
+                        camPose[n].transformBy(VisionConstants.CAMERA_TO_ROBOT_3D).toPose2d());
 
-                m_drive.m_poseEstimator.addVisionMeasurement(visionMeasurement[n], imageCaptureTime);
-
-                n++;
             }
 
         }
-           
 
+        SmartDashboard.putNumber("#TargetsSeen 1",
+                numberTargets);
+        SmartDashboard.putNumber("ImCap mSec_1",
+                imageCaptureTime);
     }
-
 }

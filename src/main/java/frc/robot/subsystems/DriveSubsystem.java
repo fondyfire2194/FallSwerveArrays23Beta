@@ -27,7 +27,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
@@ -39,7 +38,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.IDConstants;
 import frc.robot.Constants.PDPConstants;
 import frc.robot.utils.ShuffleboardContent;
-import frc.robot.utils.SwerveModuleDisplay;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -151,8 +149,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private double positionStart;
 
-  private double positionChange;
-  SendableBuilder builder;
+  double positionChange;
+  
  // private SwerveModuleDisplay m_smd = new SwerveModuleDisplay(this);
 
   /** Creates a new DriveSubsystem. */

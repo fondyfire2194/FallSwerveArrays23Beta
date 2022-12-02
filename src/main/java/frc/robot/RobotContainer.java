@@ -29,7 +29,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Vision.SetDriverMode;
-import frc.robot.commands.Vision.TargetThread;
 import frc.robot.commands.swerve.JogDriveModule;
 import frc.robot.commands.swerve.JogTurnModule;
 import frc.robot.commands.swerve.SetSwerveDrive;
@@ -43,7 +42,7 @@ public class RobotContainer {
   // The robot's subsystems
   final DriveSubsystem m_drive = new DriveSubsystem();
 
-  public VisionPoseEstimator m_vpe = new VisionPoseEstimator();
+  public VisionPoseEstimator m_vpe = new VisionPoseEstimator(m_drive);
 
   public FFDisplay ff1 = new FFDisplay("test");
 
@@ -62,8 +61,6 @@ public class RobotContainer {
   final PowerDistribution m_pdp = new PowerDistribution();
 
   final GamepadButtons codriver = new GamepadButtons(m_coDriverController, true);
-
-  TargetThread tgtTh;
 
   // temp controller for testing -matt
   // private PS4Controller m_ps4controller = new PS4Controller(1);
@@ -92,8 +89,6 @@ public class RobotContainer {
 
     initializeAutoChooser();
 
-    tgtTh = new TargetThread(m_drive, m_vpe);
-
     // PortForwarder.add(5800, "10.21.94.11", 5800);
     // PortForwarder.add(1181, "10.21.94.11", 1181);
     // PortForwarder.add(1182, "10.21.94.11", 1182);
@@ -110,8 +105,11 @@ public class RobotContainer {
     // () -> m_ps4controller.getRawAxis(0),
     // () -> m_ps4controller.getRawAxis(2)));
 
-    SmartDashboard.putData("SetDriverMode", new SetDriverMode(m_vpe.m_cam, true));
-    SmartDashboard.putData("ResetDriverMode", new SetDriverMode(m_vpe.m_cam, false));
+    SmartDashboard.putData("SetDriverMode1", new SetDriverMode(m_vpe.m_cam1, true));
+    SmartDashboard.putData("ResetDriverMode1", new SetDriverMode(m_vpe.m_cam1, false));
+
+    SmartDashboard.putData("SetDriverMode2", new SetDriverMode(m_vpe.m_cam2, true));
+    SmartDashboard.putData("ResetDriverMode2", new SetDriverMode(m_vpe.m_cam2, false));
 
     m_drive.setDefaultCommand(
         new SetSwerveDrive(

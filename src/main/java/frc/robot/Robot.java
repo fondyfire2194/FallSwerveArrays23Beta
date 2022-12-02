@@ -71,6 +71,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
    lpctra++;
+
     m_robotContainer.periodic();
 
     m_robotContainer.m_drive.throttleValue = m_robotContainer.getThrottle();
@@ -131,7 +132,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    //new RunPVTargetting(m_robotContainer.vpe, m_robotContainer.m_drive).schedule();
+  
     // new SetSwerveOdometry(m_robotContainer.m_robotDrive,
     // m_robotContainer.m_fieldSim,new Pose2d(6.13, 5.23,
     // Rotation2d.fromDegrees(-41.5))).schedule();
