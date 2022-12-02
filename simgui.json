@@ -4,7 +4,9 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Selector": "String Chooser",
       "/SmartDashboard/Field2d": "Field2d",
-      "/SmartDashboard/Scheduler": "Scheduler"
+      "/SmartDashboard/ResetDriverMode": "Command",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/SetDriverMode": "Command"
     },
     "windows": {
       "/SmartDashboard/Field2d": {
@@ -29,7 +31,9 @@
       "SmartDashboard": {
         "SM": {
           "open": true
-        },
+        }
+      },
+      "a": {
         "open": true
       }
     }

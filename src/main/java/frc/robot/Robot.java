@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +27,8 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  public static int lpctra;
+
   /**
    * This function is run when the robot is first started up and should be used
    * for any
@@ -35,12 +38,14 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // if (RobotBase.isReal())
 
-    //   DataLogManager.start();
+    //  DataLogManager.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    
 
   }
 
@@ -65,7 +70,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-   
+   lpctra++;
     m_robotContainer.periodic();
 
     m_robotContainer.m_drive.throttleValue = m_robotContainer.getThrottle();
@@ -126,7 +131,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
+    //new RunPVTargetting(m_robotContainer.vpe, m_robotContainer.m_drive).schedule();
     // new SetSwerveOdometry(m_robotContainer.m_robotDrive,
     // m_robotContainer.m_fieldSim,new Pose2d(6.13, 5.23,
     // Rotation2d.fromDegrees(-41.5))).schedule();

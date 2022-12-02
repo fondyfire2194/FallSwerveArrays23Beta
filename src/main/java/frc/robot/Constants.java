@@ -74,12 +74,6 @@ public final class Constants {
     public static final int BACK_LEFT_TURN_CHANNEL =1;
     public static final int BACK_RIGHT_TURN_CHANNEL =1;
 
-
-
-
-
-
-
   }
 
   public static final class DriveConstants {
@@ -100,18 +94,18 @@ public final class Constants {
 
     private final static Translation2d m_frontLeftLocation = new Translation2d(kWheelBase / 2, kTrackWidth / 2);
     private final static Translation2d m_frontRightLocation = new Translation2d(kWheelBase / 2, -kTrackWidth / 2);
-    private final static Translation2d m_rearLeftLocation = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
-    private final static Translation2d m_rearRightLocation = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
+    private final static Translation2d m_backLeftLocation = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
+    private final static Translation2d m_backRightLocation = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
 
     public static final Translation2d[] kModuleTranslations = {
 
         m_frontLeftLocation,
         m_frontRightLocation,
-        m_rearLeftLocation,
-        m_rearRightLocation };
+        m_backLeftLocation,
+        m_backRightLocation };
 
     public final static SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-        m_frontLeftLocation, m_frontRightLocation, m_rearLeftLocation, m_rearRightLocation);
+        m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
     public static final boolean kGyroReversed = true;
 

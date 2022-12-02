@@ -27,6 +27,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
@@ -51,8 +52,8 @@ public class DriveSubsystem extends SubsystemBase {
       CanConstants.FRONT_LEFT_MODULE_STEER_CANCODER,
       DriveConstants.kFrontLeftDriveMotorReversed,
       DriveConstants.kFrontLeftTurningMotorReversed,
-      PDPConstants.FRONT_LEFT_DRIVE_CHANNEL,  
-        PDPConstants.FRONT_LEFT_TURN_CHANNEL,
+      PDPConstants.FRONT_LEFT_DRIVE_CHANNEL,
+      PDPConstants.FRONT_LEFT_TURN_CHANNEL,
 
       CanConstants.FRONT_LEFT_MODULE_STEER_OFFSET);
 
@@ -63,29 +64,29 @@ public class DriveSubsystem extends SubsystemBase {
       CanConstants.FRONT_RIGHT_MODULE_STEER_CANCODER,
       DriveConstants.kFrontRightDriveMotorReversed,
       DriveConstants.kFrontRightTurningMotorReversed,
-      PDPConstants.FRONT_RIGHT_DRIVE_CHANNEL,  
+      PDPConstants.FRONT_RIGHT_DRIVE_CHANNEL,
       PDPConstants.FRONT_RIGHT_TURN_CHANNEL,
       CanConstants.FRONT_RIGHT_MODULE_STEER_OFFSET);
 
-  public final SwerveModuleSparkMax m_rearLeft = new SwerveModuleSparkMax(
+  public final SwerveModuleSparkMax m_backLeft = new SwerveModuleSparkMax(
       IDConstants.REAR_LEFT_LOCATION,
       CanConstants.BACK_LEFT_MODULE_DRIVE_MOTOR,
       CanConstants.BACK_LEFT_MODULE_STEER_MOTOR,
       CanConstants.BACK_LEFT_MODULE_STEER_CANCODER,
       DriveConstants.kBackLeftDriveMotorReversed,
       DriveConstants.kBackLeftTurningMotorReversed,
-      PDPConstants.BACK_LEFT_DRIVE_CHANNEL,  
+      PDPConstants.BACK_LEFT_DRIVE_CHANNEL,
       PDPConstants.BACK_LEFT_TURN_CHANNEL,
       CanConstants.BACK_LEFT_MODULE_STEER_OFFSET);
 
-  public final SwerveModuleSparkMax m_rearRight = new SwerveModuleSparkMax(
+  public final SwerveModuleSparkMax m_backRight = new SwerveModuleSparkMax(
       IDConstants.REAR_RIGHT_LOCATION,
       CanConstants.BACK_RIGHT_MODULE_DRIVE_MOTOR,
       CanConstants.BACK_RIGHT_MODULE_STEER_MOTOR,
       CanConstants.BACK_RIGHT_MODULE_STEER_CANCODER,
       DriveConstants.kBackRightDriveMotorReversed,
       DriveConstants.kBackRightTurningMotorReversed,
-      PDPConstants.BACK_LEFT_DRIVE_CHANNEL,  
+      PDPConstants.BACK_LEFT_DRIVE_CHANNEL,
       PDPConstants.BACK_LEFT_TURN_CHANNEL,
       CanConstants.BACK_RIGHT_MODULE_STEER_OFFSET);
 
@@ -120,8 +121,8 @@ public class DriveSubsystem extends SubsystemBase {
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
+          m_backLeft.getPosition(),
+          m_backRight.getPosition()
       },
 
       new Pose2d(),
@@ -151,13 +152,13 @@ public class DriveSubsystem extends SubsystemBase {
   private double positionStart;
 
   private double positionChange;
-
-  private SwerveModuleDisplay m_smd = new SwerveModuleDisplay(this);
+  SendableBuilder builder;
+ // private SwerveModuleDisplay m_smd = new SwerveModuleDisplay(this);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
 
-   SmartDashboard.putData("SM",m_smd);
+   // SmartDashboard.putData("SM", m_smd);
 
     m_gyro.reset();
 
@@ -177,7 +178,6 @@ public class DriveSubsystem extends SubsystemBase {
     if (showOnShuffleboard)
 
       ShuffleboardContent.initMisc(this);
-
 
   }
 
@@ -211,11 +211,11 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0], isOpenLoop);
     m_frontRight.setDesiredState(swerveModuleStates[1], isOpenLoop);
-    m_rearLeft.setDesiredState(swerveModuleStates[2], isOpenLoop);
-    m_rearRight.setDesiredState(swerveModuleStates[3], isOpenLoop);
+    m_backLeft.setDesiredState(swerveModuleStates[2], isOpenLoop);
+    m_backRight.setDesiredState(swerveModuleStates[3], isOpenLoop);
   }
 
- /**
+  /**
    * Sets the swerve ModuleStates.
    *
    * @param desiredStates The desired SwerveModule states.
@@ -223,12 +223,11 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(desiredStates[0],false);
-    m_frontRight.setDesiredState(desiredStates[1],false);
-    m_rearLeft.setDesiredState(desiredStates[2],false);
-    m_rearRight.setDesiredState(desiredStates[3],false);
+    m_frontLeft.setDesiredState(desiredStates[0], false);
+    m_frontRight.setDesiredState(desiredStates[1], false);
+    m_backLeft.setDesiredState(desiredStates[2], false);
+    m_backRight.setDesiredState(desiredStates[3], false);
   }
-
 
   @Override
   public void periodic() {
@@ -237,7 +236,7 @@ public class DriveSubsystem extends SubsystemBase {
     updateOdometry();
     // SmartDashboard.putNumber("Xpos", getX());
     // SmartDashboard.putNumber("Ypos", getY());
-    // SmartDashboard.putNumber("Angle", getHeadingDegrees());
+    //SmartDashboard.putNumber("Angle", getHeadingDegrees());
 
     if (startTime == 0) {
 
@@ -259,7 +258,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   }
 
-
   public void updateOdometry() {
 
     SmartDashboard.putString(("EstPosn"), getEstimatedPose().toString());
@@ -271,14 +269,14 @@ public class DriveSubsystem extends SubsystemBase {
           new SwerveModuleState[] {
               m_frontLeft.getState(),
               m_frontRight.getState(),
-              m_rearLeft.getState(),
-              m_rearRight.getState()
+              m_backLeft.getState(),
+              m_backRight.getState()
           },
           new SwerveModulePosition[] {
               m_frontLeft.getPosition(),
               m_frontRight.getPosition(),
-              m_rearLeft.getPosition(),
-              m_rearRight.getPosition()
+              m_backLeft.getPosition(),
+              m_backRight.getPosition()
           });
     }
 
@@ -314,16 +312,16 @@ public class DriveSubsystem extends SubsystemBase {
   public boolean chekCANOK() {
     return m_frontLeft.checkCAN()
         && m_frontRight.checkCAN()
-        && m_rearLeft.checkCAN()
-        && m_rearLeft.checkCAN();
+        && m_backLeft.checkCAN()
+        && m_backLeft.checkCAN();
 
   }
 
   public void resetModuleEncoders() {
     m_frontLeft.resetAngleToAbsolute();
     m_frontRight.resetAngleToAbsolute();
-    m_rearLeft.resetAngleToAbsolute();
-    m_rearRight.resetAngleToAbsolute();
+    m_backLeft.resetAngleToAbsolute();
+    m_backRight.resetAngleToAbsolute();
   }
 
   /** Zeroes the heading of the robot. */
@@ -377,10 +375,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontLeft.setTurnBrakeMode(brake);
     m_frontRight.setDriveBrakeMode(brake);
     m_frontRight.setTurnBrakeMode(brake);
-    m_rearLeft.setDriveBrakeMode(brake);
-    m_rearLeft.setTurnBrakeMode(brake);
-    m_rearRight.setDriveBrakeMode(brake);
-    m_rearRight.setTurnBrakeMode(brake);
+    m_backLeft.setDriveBrakeMode(brake);
+    m_backLeft.setTurnBrakeMode(brake);
+    m_backRight.setDriveBrakeMode(brake);
+    m_backRight.setTurnBrakeMode(brake);
 
   }
 
@@ -392,8 +390,8 @@ public class DriveSubsystem extends SubsystemBase {
         new SwerveModuleState[] {
             m_frontLeft.getState(),
             m_frontRight.getState(),
-            m_rearLeft.getState(),
-            m_rearRight.getState()
+            m_backLeft.getState(),
+            m_backRight.getState()
         });
     // want to simulate navX gyro changing as robot turns
     // information available is radians per second and this happens every 20ms
@@ -432,5 +430,4 @@ public class DriveSubsystem extends SubsystemBase {
     return 180 * throttleValue;
   }
 
-  
 }

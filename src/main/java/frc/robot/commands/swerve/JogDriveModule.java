@@ -58,8 +58,8 @@ public class JogDriveModule extends CommandBase {
 
       m_swerveDrive.m_frontLeft.driveMotorMove(throttle);
       m_swerveDrive.m_frontRight.driveMotorMove(throttle);
-      m_swerveDrive.m_rearLeft.driveMotorMove(throttle);
-      m_swerveDrive.m_rearRight.driveMotorMove(throttle);
+      m_swerveDrive.m_backLeft.driveMotorMove(throttle);
+      m_swerveDrive.m_backRight.driveMotorMove(throttle);
 
     } else {
 
@@ -67,9 +67,9 @@ public class JogDriveModule extends CommandBase {
 
       m_swerveDrive.m_frontRight.driveMotorMove(strafe);
 
-      m_swerveDrive.m_rearLeft.driveMotorMove(rotation);
+      m_swerveDrive.m_backLeft.driveMotorMove(rotation);
 
-      m_swerveDrive.m_rearRight.driveMotorMove(test);
+      m_swerveDrive.m_backRight.driveMotorMove(test);
     }
 
   }
@@ -79,8 +79,8 @@ public class JogDriveModule extends CommandBase {
   public void end(boolean interrupted) {
     m_swerveDrive.m_frontLeft.driveMotorMove(0);
     m_swerveDrive.m_frontRight.driveMotorMove(0);
-    m_swerveDrive.m_rearLeft.driveMotorMove(0);
-    m_swerveDrive.m_rearRight.driveMotorMove(0);
+    m_swerveDrive.m_backLeft.driveMotorMove(0);
+    m_swerveDrive.m_backRight.driveMotorMove(0);
 
   }
 

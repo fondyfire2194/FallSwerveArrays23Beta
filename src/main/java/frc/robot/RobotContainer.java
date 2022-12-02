@@ -29,19 +29,23 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Vision.SetDriverMode;
+import frc.robot.commands.Vision.TargetThread;
 import frc.robot.commands.swerve.JogDriveModule;
 import frc.robot.commands.swerve.JogTurnModule;
 import frc.robot.commands.swerve.SetSwerveDrive;
 import frc.robot.simulation.FieldSim;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.VisionPoseEstimator;
+import frc.robot.utils.FFDisplay;
 import frc.robot.utils.LEDControllerI2C;
 
 public class RobotContainer {
   // The robot's subsystems
   final DriveSubsystem m_drive = new DriveSubsystem();
 
- public VisionPoseEstimator vpe = new VisionPoseEstimator();
+  public VisionPoseEstimator m_vpe = new VisionPoseEstimator();
+
+  public FFDisplay ff1 = new FFDisplay("test");
 
   LEDControllerI2C lcI2;
 
@@ -58,6 +62,8 @@ public class RobotContainer {
   final PowerDistribution m_pdp = new PowerDistribution();
 
   final GamepadButtons codriver = new GamepadButtons(m_coDriverController, true);
+
+  TargetThread tgtTh;
 
   // temp controller for testing -matt
   // private PS4Controller m_ps4controller = new PS4Controller(1);
@@ -86,6 +92,8 @@ public class RobotContainer {
 
     initializeAutoChooser();
 
+    tgtTh = new TargetThread(m_drive, m_vpe);
+
     // PortForwarder.add(5800, "10.21.94.11", 5800);
     // PortForwarder.add(1181, "10.21.94.11", 1181);
     // PortForwarder.add(1182, "10.21.94.11", 1182);
@@ -102,9 +110,9 @@ public class RobotContainer {
     // () -> m_ps4controller.getRawAxis(0),
     // () -> m_ps4controller.getRawAxis(2)));
 
-    SmartDashboard.putData("SetDriverMode", new SetDriverMode(vpe.m_cam, true));
-    SmartDashboard.putData("ResetDriverMode", new SetDriverMode(vpe.m_cam, false));
-    
+    SmartDashboard.putData("SetDriverMode", new SetDriverMode(m_vpe.m_cam, true));
+    SmartDashboard.putData("ResetDriverMode", new SetDriverMode(m_vpe.m_cam, false));
+
     m_drive.setDefaultCommand(
         new SetSwerveDrive(
             m_drive,
@@ -172,48 +180,44 @@ public class RobotContainer {
     return -leftJoystick.getThrottle();
   }
 
-   /**
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
     // Create config for trajectory
-    TrajectoryConfig config =
-        new TrajectoryConfig(
-                AutoConstants.kMaxSpeedMetersPerSecond,
-                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-            // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveConstants.m_kinematics);
+    TrajectoryConfig config = new TrajectoryConfig(
+        AutoConstants.kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(DriveConstants.m_kinematics);
 
-    // An example trajectory to follow.  All units in meters.
-    Trajectory exampleTrajectory =
-        TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, new Rotation2d(0)),
-            config);
+    // An example trajectory to follow. All units in meters.
+    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+        // Start at the origin facing the +X direction
+        new Pose2d(0, 0, new Rotation2d(0)),
+        // Pass through these two interior waypoints, making an 's' curve path
+        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        // End 3 meters straight ahead of where we started, facing forward
+        new Pose2d(3, 0, new Rotation2d(0)),
+        config);
 
-    var thetaController =
-        new ProfiledPIDController(
-            AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+    var thetaController = new ProfiledPIDController(
+        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    SwerveControllerCommand swerveControllerCommand =
-        new SwerveControllerCommand(
-            exampleTrajectory,
-            m_drive::getEstimatedPose, // Functional interface to feed supplier
-            DriveConstants.m_kinematics,
+    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+        exampleTrajectory,
+        m_drive::getEstimatedPose, // Functional interface to feed supplier
+        DriveConstants.m_kinematics,
 
-            // Position controllers
-            new PIDController(AutoConstants.kPXController, 0, 0),
-            new PIDController(AutoConstants.kPYController, 0, 0),
-            thetaController,
-            m_drive::setModuleStates,
-            m_drive);
+        // Position controllers
+        new PIDController(AutoConstants.kPXController, 0, 0),
+        new PIDController(AutoConstants.kPYController, 0, 0),
+        thetaController,
+        m_drive::setModuleStates,
+        m_drive);
 
     // Reset odometry to the starting pose of the trajectory.
     m_drive.setOdometry(exampleTrajectory.getInitialPose());
@@ -221,6 +225,5 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     return swerveControllerCommand.andThen(() -> m_drive.drive(0, 0, 0, false));
   }
-
 
 }

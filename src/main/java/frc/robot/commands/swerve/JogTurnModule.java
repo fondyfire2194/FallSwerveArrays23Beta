@@ -57,9 +57,9 @@ public class JogTurnModule extends CommandBase {
 
     m_swerveDrive.m_frontRight.turnMotorMove(strafe);
 
-    m_swerveDrive.m_rearLeft.turnMotorMove(rotation);
+    m_swerveDrive.m_backLeft.turnMotorMove(rotation);
 
-    m_swerveDrive.m_rearRight.turnMotorMove(test);
+    m_swerveDrive.m_backRight.turnMotorMove(test);
 
   }
 
@@ -70,9 +70,9 @@ public class JogTurnModule extends CommandBase {
 
     m_swerveDrive.m_frontRight.turnMotorMove(0);
 
-    m_swerveDrive.m_rearLeft.turnMotorMove(0);
+    m_swerveDrive.m_backLeft.turnMotorMove(0);
 
-    m_swerveDrive.m_rearRight.turnMotorMove(0);
+    m_swerveDrive.m_backRight.turnMotorMove(0);
 
   }
 
