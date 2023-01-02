@@ -4,37 +4,17 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Selector": "String Chooser",
       "/SmartDashboard/Field2d": "Field2d",
-      "/SmartDashboard/ResetDriverMode": "Command",
+      "/SmartDashboard/ResetDriverMode1": "Command",
+      "/SmartDashboard/ResetDriverMode2": "Command",
       "/SmartDashboard/Scheduler": "Scheduler",
-      "/SmartDashboard/SetDriverMode": "Command"
+      "/SmartDashboard/SetDriverMode1": "Command",
+      "/SmartDashboard/SetDriverMode2": "Command"
     },
     "windows": {
       "/SmartDashboard/Field2d": {
-        "bottom": 900,
-        "height": 8.229599952697754,
-        "image": "C:\\Users\\John\\Documents\\FRC2023Beta\\SwerveControllerCommand-Arrays -PHVIs\\src\\main\\images\\2022-field.png",
-        "left": 74,
-        "right": 1774,
-        "top": 50,
-        "width": 16.459199905395508,
         "window": {
           "visible": true
         }
-      }
-    }
-  },
-  "NetworkTables": {
-    "Retained Values": {
-      "open": false
-    },
-    "transitory": {
-      "SmartDashboard": {
-        "SM": {
-          "open": true
-        }
-      },
-      "a": {
-        "open": true
       }
     }
   }

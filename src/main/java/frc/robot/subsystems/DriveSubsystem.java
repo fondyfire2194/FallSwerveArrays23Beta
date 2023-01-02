@@ -109,26 +109,17 @@ public class DriveSubsystem extends SubsystemBase {
    * The numbers used
    * below are robot specific, and should be tuned.
    */
-  public final SwerveDrivePoseEstimator<N7, N7, N5> m_poseEstimator = new SwerveDrivePoseEstimator<N7, N7, N5>(
-      Nat.N7(),
-      Nat.N7(),
-      Nat.N5(),
-
+  private final SwerveDrivePoseEstimator m_poseEstimator = new SwerveDrivePoseEstimator(
+      m_kinematics,
       m_gyro.getRotation2d(),
-
       new SwerveModulePosition[] {
           m_frontLeft.getPosition(),
           m_frontRight.getPosition(),
           m_backLeft.getPosition(),
           m_backRight.getPosition()
       },
-
       new Pose2d(),
-
-      m_kinematics,
-
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05, 0.05, 0.05),
-      VecBuilder.fill(Units.degreesToRadians(0.01), 0.01, 0.01, 0.01, 0.01),
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
       VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
   private boolean showOnShuffleboard = false;
@@ -150,13 +141,13 @@ public class DriveSubsystem extends SubsystemBase {
   private double positionStart;
 
   double positionChange;
-  
- // private SwerveModuleDisplay m_smd = new SwerveModuleDisplay(this);
+
+  // private SwerveModuleDisplay m_smd = new SwerveModuleDisplay(this);
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem() {
 
-   // SmartDashboard.putData("SM", m_smd);
+    // SmartDashboard.putData("SM", m_smd);
 
     m_gyro.reset();
 
@@ -234,7 +225,7 @@ public class DriveSubsystem extends SubsystemBase {
     updateOdometry();
     // SmartDashboard.putNumber("Xpos", getX());
     // SmartDashboard.putNumber("Ypos", getY());
-    //SmartDashboard.putNumber("Angle", getHeadingDegrees());
+    // SmartDashboard.putNumber("Angle", getHeadingDegrees());
 
     if (startTime == 0) {
 
@@ -262,14 +253,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     if (chekCANOK()) {
 
+      /** Updates the field relative position of the robot. */
+
       m_poseEstimator.update(
           m_gyro.getRotation2d(),
-          new SwerveModuleState[] {
-              m_frontLeft.getState(),
-              m_frontRight.getState(),
-              m_backLeft.getState(),
-              m_backRight.getState()
-          },
           new SwerveModulePosition[] {
               m_frontLeft.getPosition(),
               m_frontRight.getPosition(),
@@ -277,7 +264,6 @@ public class DriveSubsystem extends SubsystemBase {
               m_backRight.getPosition()
           });
     }
-
   }
 
   public Pose2d getEstimatedPose() {

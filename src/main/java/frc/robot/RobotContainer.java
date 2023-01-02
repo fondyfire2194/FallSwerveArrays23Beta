@@ -4,7 +4,14 @@
 
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.List;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -28,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.Test.MessageShuffleboard;
 import frc.robot.commands.Vision.SetDriverMode;
 import frc.robot.commands.swerve.JogDriveModule;
 import frc.robot.commands.swerve.JogTurnModule;
@@ -61,7 +69,9 @@ public class RobotContainer {
   final PowerDistribution m_pdp = new PowerDistribution();
 
   final GamepadButtons codriver = new GamepadButtons(m_coDriverController, true);
+  SwerveAutoBuilder autoBuilder;
 
+  List<PathPlannerTrajectory> pathGroup;
   // temp controller for testing -matt
   // private PS4Controller m_ps4controller = new PS4Controller(1);
   // public PoseTelemetry pt = new PoseTelemetry();
@@ -88,6 +98,8 @@ public class RobotContainer {
     lcI2 = LEDControllerI2C.getInstance();
 
     initializeAutoChooser();
+
+    createSomething();
 
     // PortForwarder.add(5800, "10.21.94.11", 5800);
     // PortForwarder.add(1181, "10.21.94.11", 1181);
@@ -178,50 +190,42 @@ public class RobotContainer {
     return -leftJoystick.getThrottle();
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // Create config for trajectory
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        // Add kinematics to ensure max speed is actually obeyed
-        .setKinematics(DriveConstants.m_kinematics);
+  public void createSomething() {
 
-    // An example trajectory to follow. All units in meters.
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints, making an 's' curve path
-        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        config);
+    pathGroup = PathPlanner.loadPathGroup("Drive Straight", new PathConstraints(1, 1));
 
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    // This is just an example event map. It would be better to have a constant,
+    // global event map
+    // in your code that can be used repeatedly.
+    HashMap<String, Command> eventMap = new HashMap<>();
+    eventMap.put("shooterStart", new MessageShuffleboard("ShooterStart", 5000));
+    eventMap.put("intakeDown", new MessageShuffleboard("Intake Down", 1));
+    eventMap.put("intakeOn", new MessageShuffleboard("Intake Run", 2));
+    eventMap.put("intakeOff", new MessageShuffleboard("Intake Stop", 3));
+    eventMap.put("turnToTarget", new MessageShuffleboard("DriveTurnTotarget", 0));
+    eventMap.put("shoot", new MessageShuffleboard("ShooterShoot", 10));
 
-    SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_drive::getEstimatedPose, // Functional interface to feed supplier
-        DriveConstants.m_kinematics,
+    // Create the AutoBuilder. This only needs to be created once when robot code
+    // starts,
+    // not every time you want to create an auto command. A good place to put this
+    // is
+    // in RobotContainer along with your subsystems.
 
-        // Position controllers
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
-        thetaController,
-        m_drive::setModuleStates,
+    autoBuilder = new SwerveAutoBuilder(
+        m_drive::getEstimatedPose, // null,
+        m_drive::setOdometry, // null,
+        DriveConstants.m_kinematics, // null,
+        new PIDConstants(5.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y
+                                         // PID controllers)
+        new PIDConstants(0.5, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation
+                                         // controller)
+        m_drive::setModuleStates, // Module states consumer used to output to the drive subsystem
+        eventMap,
         m_drive);
 
-    // Reset odometry to the starting pose of the trajectory.
-    m_drive.setOdometry(exampleTrajectory.getInitialPose());
-
-    // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_drive.drive(0, 0, 0, false));
   }
 
+  public Command getAutonomousCommand() {
+    return autoBuilder.fullAuto(pathGroup);
+  }
 }
