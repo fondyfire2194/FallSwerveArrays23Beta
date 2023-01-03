@@ -225,7 +225,6 @@ public class SwerveModuleSparkMax extends SubsystemBase {
       ShuffleboardContent.initCoderBooleanShuffleboard(this);
     }
 
-    
   }
 
   @Override
@@ -372,14 +371,24 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     if (RobotBase.isSimulation()) {
 
-      m_driveVelController.setReference(state.speedMetersPerSecond, ControlType.kVelocity, SIM_SLOT);
+      SmartDashboard.putNumber("SSPDMPS", state.speedMetersPerSecond);
 
+      // m_driveVelController.setReference(state.speedMetersPerSecond,
+      // ControlType.kVelocity, SIM_SLOT);
+
+      double temp = state.speedMetersPerSecond;
+
+      if (DriverStation.isAutonomousEnabled())
+
+        temp = temp / ModuleConstants.kFreeMetersPerSecond;
+        SmartDashboard.putNumber("SSPTMP", temp);
+
+      m_driveMotor.setVoltage(temp * RobotController.getBatteryVoltage());
       // no simulation for angle - angle command is returned directly to drive
       // subsystem as actual angle in 2 places - getState() and getHeading
 
       simTurnPosition(angle);
     }
-
   }
 
   public static double limitMotorCmd(double motorCmdIn) {
@@ -533,6 +542,4 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
   }
 
-  
-  
 }

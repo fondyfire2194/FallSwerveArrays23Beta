@@ -12,9 +12,36 @@
     },
     "windows": {
       "/SmartDashboard/Field2d": {
+        "Robot": {
+          "image": "resources/images/robot.png",
+          "length": 0.6850000023841858,
+          "width": 0.5
+        },
+        "Swerve Modules": {
+          "image": "resources/images/swerve_module.png",
+          "length": 0.4000000059604645,
+          "width": 0.4000000059604645
+        },
+        "bottom": 900,
+        "height": 8.229599952697754,
+        "image": "resources/images/2022-field.png",
+        "left": 74,
+        "right": 1774,
+        "top": 50,
+        "width": 16.459199905395508,
         "window": {
           "visible": true
         }
+      }
+    }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
       }
     }
   }

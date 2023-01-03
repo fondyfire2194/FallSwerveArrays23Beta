@@ -24,8 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N5;
-import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
@@ -142,6 +140,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   double positionChange;
 
+  public boolean isOpenLoop = true;
+
   // private SwerveModuleDisplay m_smd = new SwerveModuleDisplay(this);
 
   /** Creates a new DriveSubsystem. */
@@ -192,7 +192,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    * field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean isOpenLoop) {
+  public void drive(double xSpeed, double ySpeed, double rot) {
     var swerveModuleStates = m_kinematics.toSwerveModuleStates(
         this.m_fieldOriented
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
@@ -212,10 +212,10 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(desiredStates[0], false);
-    m_frontRight.setDesiredState(desiredStates[1], false);
-    m_backLeft.setDesiredState(desiredStates[2], false);
-    m_backRight.setDesiredState(desiredStates[3], false);
+    m_frontLeft.setDesiredState(desiredStates[0],isOpenLoop);
+    m_frontRight.setDesiredState(desiredStates[1],isOpenLoop);
+    m_backLeft.setDesiredState(desiredStates[2], isOpenLoop);
+    m_backRight.setDesiredState(desiredStates[3], isOpenLoop);
   }
 
   @Override
