@@ -212,8 +212,8 @@ public class DriveSubsystem extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-    m_frontLeft.setDesiredState(desiredStates[0],isOpenLoop);
-    m_frontRight.setDesiredState(desiredStates[1],isOpenLoop);
+    m_frontLeft.setDesiredState(desiredStates[0], isOpenLoop);
+    m_frontRight.setDesiredState(desiredStates[1], isOpenLoop);
     m_backLeft.setDesiredState(desiredStates[2], isOpenLoop);
     m_backRight.setDesiredState(desiredStates[3], isOpenLoop);
   }
@@ -271,7 +271,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setOdometry(Pose2d pose) {
-    m_poseEstimator.resetPosition(getHeadingRotation2d(), null, pose);
+    m_poseEstimator.resetPosition(getHeadingRotation2d(), new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_backLeft.getPosition(),
+        m_backRight.getPosition() }, pose);
     m_gyro.reset();
 
   }
