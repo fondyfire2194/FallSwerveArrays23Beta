@@ -93,10 +93,14 @@ public class SwerveModuleSparkMax extends SubsystemBase {
   public boolean turnCoderConnected;
   private boolean useRRPid = true;
   private double turnDeadband = .5;
-  private boolean showOnShuffleboard = false;
+  private boolean showOnShuffleboard = true;
   private boolean driveBrakeMode;
   private boolean turnBrakeMode;
   public SendableBuilder m_builder;
+
+  private int testCall;
+  private double simDriveEncoderPosition;
+  private double simDriveVelocity;
 
   /**
    * Constructs a SwerveModule.
@@ -162,9 +166,12 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     m_driveEncoder = m_driveMotor.getEncoder();
 
-    m_driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveMetersPerEncRev);
+    SmartDashboard.putNumber("DriveMETPERENCREv", ModuleConstants.kDriveMetersPerEncRev);
 
-    m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveMetersPerEncRev / 60);
+    // m_driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveMetersPerEncRev);
+
+    // m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveMetersPerEncRev
+    // / 60);
 
     m_driveVelSMController = m_driveMotor.getPIDController();
 
@@ -182,7 +189,7 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     else {
 
-      m_driveVelSMController.setP(1,SIM_SLOT);
+      m_driveVelSMController.setP(2, SIM_SLOT);
 
     }
 
@@ -216,7 +223,9 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     checkCAN();
 
-    resetAngleToAbsolute();
+    if (RobotBase.isReal())
+
+      resetAngleToAbsolute();
 
     if (showOnShuffleboard) {
 
@@ -291,32 +300,14 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
   public SwerveModuleState getState() {
 
-    if (RobotBase.isReal())
-
-      return new SwerveModuleState(m_driveEncoder.getVelocity(),
-
-          getHeadingRotation2d());
-
-    else
-
-      return new SwerveModuleState(m_driveEncoder.getVelocity(), Rotation2d.fromDegrees((angle)));
+    return new SwerveModuleState(simDriveVelocity, Rotation2d.fromDegrees((angle)));
   }
 
   public SwerveModulePosition getPosition() {
 
-    // if (RobotBase.isSimulation())
-
-    // return new SwerveModulePosition(getDrivePosition(),
-    // Rotation2d.fromDegrees((angle)));
-
-    // if (RobotBase.isReal() && checkCAN())
-
-    return new SwerveModulePosition(getDrivePosition(),
-
-        getHeadingRotation2d());
-
-    // else
-    // return new SwerveModulePosition(0, new Rotation2d());
+    double tempPos = getDrivePosition();
+    Rotation2d tempAngle = getHeadingRotation2d();
+    return new SwerveModulePosition(tempPos, tempAngle);
 
   }
 
@@ -329,8 +320,8 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     state = AngleUtils.optimize(desiredState, getHeadingRotation2d());
 
-    // state = SwerveModuleState.optimize(desiredState, new
-    // Rotation2d(actualAngleDegrees));
+    SmartDashboard.putNumber("StateSpeed", state.speedMetersPerSecond);
+    SmartDashboard.putNumber("StateAngle", state.angle.getDegrees());
 
     // turn motor code
     // Prevent rotating module if speed is less then 1%. Prevents Jittering.
@@ -373,17 +364,9 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     if (RobotBase.isSimulation()) {
 
-      SmartDashboard.putNumber("SSPDMPS", state.speedMetersPerSecond);
+      // rev position sim not working - do own position sim
+      simDriveEncoderPosition();
 
-    //  double pidOut = m_driveVelController.calculate(getDriveVelocity(), state.speedMetersPerSecond);
-     // SmartDashboard.putNumber("PIDOUT", pidOut);
-     SmartDashboard.putNumber("DRVEL", getDriveVelocity()/1000);
-     SmartDashboard.putNumber("DRPOS", getDrivePosition());
-      
-
-      m_driveMotor.setVoltage(state.speedMetersPerSecond);
-
-     // m_driveMotor.setVoltage(state.speedMetersPerSecond);
       // no simulation for angle - angle command is returned directly to drive
       // subsystem as actual angle in 2 places - getState() and getHeading
 
@@ -399,6 +382,7 @@ public class SwerveModuleSparkMax extends SubsystemBase {
   public void resetEncoders() {
     m_driveEncoder.setPosition(0);
     m_turningEncoder.setPosition(0);
+    simDriveEncoderPosition = 0;
 
   }
 
@@ -475,24 +459,45 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
   private void simTurnPosition(double angle) {
 
-    if (angle != actualAngleDegrees && angleIncrementPer20ms == 0) {
+    actualAngleDegrees = angle;
 
-      angleDifference = angle - actualAngleDegrees;
+    // if (angle != actualAngleDegrees && angleIncrementPer20ms == 0) {
 
-      angleIncrementPer20ms = angleDifference / 10;// 10*20ms = .2 sec move time
-    }
+    // angleDifference = angle - actualAngleDegrees;
 
-    if (angleIncrementPer20ms != 0) {
+    // angleIncrementPer20ms = angleDifference / 5;// 5*20ms = .1 sec move time
+    // }
 
-      actualAngleDegrees += angleIncrementPer20ms;
+    // if (angleIncrementPer20ms != 0) {
 
-      if ((Math.abs(angle - actualAngleDegrees)) < .1) {
+    // actualAngleDegrees += angleIncrementPer20ms;
 
-        actualAngleDegrees = angle;
+    // if (actualAngleDegrees > 180)
 
-        angleIncrementPer20ms = 0;
-      }
-    }
+    // actualAngleDegrees -= 180;
+
+    // if (actualAngleDegrees < -180)
+
+    // actualAngleDegrees += 180;
+
+    // if ((Math.abs(angle - actualAngleDegrees)) < .2) {
+
+    // actualAngleDegrees = angle;
+
+    // angleIncrementPer20ms = 0;
+    // }
+    // }
+  }
+
+  private double simDriveEncoderPosition() {
+
+    double vel = state.speedMetersPerSecond;
+    simDriveVelocity = vel;
+    double distancePer20Ms = vel / 50;
+
+    simDriveEncoderPosition += distancePer20Ms;
+    SmartDashboard.putNumber("SIMDPOS", simDriveEncoderPosition);
+    return simDriveEncoderPosition;
   }
 
   public void driveMotorMove(double speed) {
@@ -500,11 +505,22 @@ public class SwerveModuleSparkMax extends SubsystemBase {
   }
 
   public double getDriveVelocity() {
-    return m_driveEncoder.getVelocity();
+    if (RobotBase.isReal())
+      return m_driveEncoder.getVelocity();
+    else
+      return simDriveVelocity;
+
   }
 
   public double getDrivePosition() {
-    return m_driveEncoder.getPosition();
+    SmartDashboard.putNumber("TCPP", testCall++);
+    SmartDashboard.putNumber("GEGPCF", m_driveEncoder.getPositionConversionFactor());
+    SmartDashboard.putNumber("GEGPREV", m_driveEncoder.getCountsPerRevolution());
+
+    if (RobotBase.isReal())
+      return m_driveEncoder.getPosition();
+    else
+      return simDriveEncoderPosition;/// ModuleConstants.kDriveMetersPerEncRev;
   }
 
   public double getDriveCurrent() {

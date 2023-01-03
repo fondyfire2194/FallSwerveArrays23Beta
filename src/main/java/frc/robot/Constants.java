@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -62,17 +61,17 @@ public final class Constants {
 
   }
 
-  public class PDPConstants{
+  public class PDPConstants {
 
-    public static final int FRONT_LEFT_DRIVE_CHANNEL =1;
-    public static final int FRONT_RIGHT_DRIVE_CHANNEL =1;
-    public static final int BACK_LEFT_DRIVE_CHANNEL =1;
-    public static final int BACK_RIGHT_DRIVE_CHANNEL =1;
+    public static final int FRONT_LEFT_DRIVE_CHANNEL = 1;
+    public static final int FRONT_RIGHT_DRIVE_CHANNEL = 1;
+    public static final int BACK_LEFT_DRIVE_CHANNEL = 1;
+    public static final int BACK_RIGHT_DRIVE_CHANNEL = 1;
 
-    public static final int FRONT_LEFT_TURN_CHANNEL =1;
-    public static final int FRONT_RIGHT_TURN_CHANNEL =1;
-    public static final int BACK_LEFT_TURN_CHANNEL =1;
-    public static final int BACK_RIGHT_TURN_CHANNEL =1;
+    public static final int FRONT_LEFT_TURN_CHANNEL = 1;
+    public static final int FRONT_RIGHT_TURN_CHANNEL = 1;
+    public static final int BACK_LEFT_TURN_CHANNEL = 1;
+    public static final int BACK_RIGHT_TURN_CHANNEL = 1;
 
   }
 
@@ -103,6 +102,7 @@ public final class Constants {
         m_frontRightLocation,
         m_backLeftLocation,
         m_backRightLocation };
+
 
     public final static SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
         m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
@@ -163,7 +163,7 @@ public final class Constants {
 
     public static double kEncoderRevsPerMeter = 1 / kDriveMetersPerEncRev;// 25.511337897182322
 
-    public static double kFreeMetersPerSecond =3;//5600 * kDriveEncRPMperMPS;// 3.6
+    public static double kFreeMetersPerSecond = 3;// 5600 * kDriveEncRPMperMPS;// 3.6
 
     public static final double kTurningDegreesPerEncRev =
 
@@ -241,9 +241,8 @@ public final class Constants {
     public static final double kPThetaController = 1;
 
     // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
   public static class VisionConstants {

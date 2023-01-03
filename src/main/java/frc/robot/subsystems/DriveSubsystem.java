@@ -4,13 +4,13 @@
 
 package frc.robot.subsystems;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import com.kauailabs.navx.frc.AHRS;
-
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -22,8 +22,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.SPI;
@@ -97,11 +95,6 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kD_Theta,
       Constants.TrapezoidConstants.kThetaControllerConstraints);
 
-  public static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1,
-      Units.degreesToRadians(5));
-  public static final Matrix<N1, N1> localMeasurementStdDevs = VecBuilder.fill(Units.degreesToRadians(0.01));
-  public static final Matrix<N3, N1> visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(5));
-
   /*
    * Here we use SwerveDrivePoseEstimator so that we can fuse odometry readings.
    * The numbers used
@@ -120,11 +113,9 @@ public class DriveSubsystem extends SubsystemBase {
       VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5)),
       VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30)));
 
-  private boolean showOnShuffleboard = false;
+  private boolean showOnShuffleboard = true;
 
   private SimDouble m_simAngle;// navx sim
-
-  private double m_simYaw;
 
   public double throttleValue;
 
@@ -223,9 +214,9 @@ public class DriveSubsystem extends SubsystemBase {
     // Update the odometry in the periodic block
 
     updateOdometry();
-    // SmartDashboard.putNumber("Xpos", getX());
-    // SmartDashboard.putNumber("Ypos", getY());
-    // SmartDashboard.putNumber("Angle", getHeadingDegrees());
+    SmartDashboard.putNumber("Xpos", getX());
+    SmartDashboard.putNumber("Ypos", getY());
+    SmartDashboard.putNumber("Angle", getHeadingDegrees());
 
     if (startTime == 0) {
 
@@ -250,8 +241,10 @@ public class DriveSubsystem extends SubsystemBase {
   public void updateOdometry() {
 
     SmartDashboard.putString(("EstPosn"), getEstimatedPose().toString());
+    SmartDashboard.putString(("FLModPos"), m_frontLeft.getPosition().toString());
+    SmartDashboard.putNumber(("FLDrPos"), m_frontLeft.getDrivePosition());
 
-    if (chekCANOK()) {
+    if (checkCANOK()) {
 
       /** Updates the field relative position of the robot. */
 
@@ -263,6 +256,15 @@ public class DriveSubsystem extends SubsystemBase {
               m_backLeft.getPosition(),
               m_backRight.getPosition()
           });
+
+      // Also apply vision measurements. We use 0.3 seconds in the past as an example
+      // -- on
+      // a real robot, this must be calculated based either on latency or timestamps.
+      // m_poseEstimator.addVisionMeasurement(
+      // ExampleGlobalMeasurementSensor.getEstimatedGlobalPose(
+      // m_poseEstimator.getEstimatedPosition()),
+      // Timer.getFPGATimestamp() - 0.3);
+
     }
   }
 
@@ -271,11 +273,13 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setOdometry(Pose2d pose) {
-    m_poseEstimator.resetPosition(getHeadingRotation2d(), new SwerveModulePosition[] {
-        m_frontLeft.getPosition(),
-        m_frontRight.getPosition(),
-        m_backLeft.getPosition(),
-        m_backRight.getPosition() }, pose);
+    m_poseEstimator.resetPosition(getHeadingRotation2d(),
+        new SwerveModulePosition[] {
+            m_frontLeft.getPosition(),
+            m_frontRight.getPosition(),
+            m_backLeft.getPosition(),
+            m_backRight.getPosition() },
+        pose);
     m_gyro.reset();
 
   }
@@ -297,11 +301,12 @@ public class DriveSubsystem extends SubsystemBase {
     return Rotation2d.fromDegrees(getHeadingDegrees());
   }
 
-  public boolean chekCANOK() {
-    return m_frontLeft.checkCAN()
-        && m_frontRight.checkCAN()
-        && m_backLeft.checkCAN()
-        && m_backLeft.checkCAN();
+  public boolean checkCANOK() {
+    return RobotBase.isSimulation() ||
+        m_frontLeft.checkCAN()
+            && m_frontRight.checkCAN()
+            && m_backLeft.checkCAN()
+            && m_backLeft.checkCAN();
 
   }
 
@@ -389,7 +394,7 @@ public class DriveSubsystem extends SubsystemBase {
     // so degree increment multiplier is 360/100pi = 1.1459
 
     double temp = chassisSpeedSim.omegaRadiansPerSecond * 1.1459155;
-
+    SmartDashboard.putNumber("CHSSM", chassisSpeedSim.omegaRadiansPerSecond);
     temp += m_simAngle.get();
 
     m_simAngle.set(temp);

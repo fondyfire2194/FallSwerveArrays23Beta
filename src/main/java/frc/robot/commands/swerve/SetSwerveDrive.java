@@ -59,6 +59,11 @@ public class SetSwerveDrive extends CommandBase {
     strafe = -Math.signum(strafe) * Math.pow(strafe, 2);
     rotation = -Math.signum(rotation) * Math.pow(rotation, 2);
 
+    throttle *= DriveConstants.kMaxSpeedMetersPerSecond;
+    strafe *= DriveConstants.kMaxSpeedMetersPerSecond;
+    rotation *= DriveConstants.kMaxRotationRadiansPerSecond;
+
+
     double throttle_sl = m_slewX.calculate(throttle);
     double strafe_sl = m_slewY.calculate(strafe);
     double rotation_sl = m_slewRot.calculate(rotation);

@@ -4,6 +4,7 @@
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Selector": "String Chooser",
       "/SmartDashboard/Field2d": "Field2d",
+      "/SmartDashboard/PPSwerveControllerCommand_field": "Field2d",
       "/SmartDashboard/ResetDriverMode1": "Command",
       "/SmartDashboard/ResetDriverMode2": "Command",
       "/SmartDashboard/Scheduler": "Scheduler",
@@ -38,7 +39,15 @@
   "NetworkTables": {
     "transitory": {
       "Shuffleboard": {
-        "open": true
+        "Drivetrain": {
+          "FL  Drive": {
+            "open": true
+          },
+          "FL  Turn": {
+            "open": true
+          },
+          "open": true
+        }
       },
       "SmartDashboard": {
         "open": true

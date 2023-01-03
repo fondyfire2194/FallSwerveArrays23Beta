@@ -182,7 +182,7 @@ public class RobotContainer {
 
   public void createSomething() {
 
-    pathGroup = PathPlanner.loadPathGroup("Drive Straight", new PathConstraints(1, 1));
+    pathGroup = PathPlanner.loadPathGroup("Drive Straight", new PathConstraints(3, 3));
 
     // This is just an example event map. It would be better to have a constant,
     // global event map
