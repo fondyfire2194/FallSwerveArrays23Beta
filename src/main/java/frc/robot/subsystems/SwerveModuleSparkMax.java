@@ -42,7 +42,9 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
   private final RelativeEncoder m_turningEncoder;
 
-  private final SparkMaxPIDController m_driveVelController;
+  private final SparkMaxPIDController m_driveVelSMController;
+
+  private final PIDController m_driveVelController = new PIDController(.001, 0, 0);
 
   private SparkMaxPIDController m_turnSMController = null;
 
@@ -164,23 +166,23 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
     m_driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveMetersPerEncRev / 60);
 
-    m_driveVelController = m_driveMotor.getPIDController();
+    m_driveVelSMController = m_driveMotor.getPIDController();
 
     if (RobotBase.isReal()) {
 
-      m_driveVelController.setP(.01, VEL_SLOT);
+      m_driveVelSMController.setP(.01, VEL_SLOT);
 
-      m_driveVelController.setD(0, VEL_SLOT);
+      m_driveVelSMController.setD(0, VEL_SLOT);
 
-      m_driveVelController.setI(0, VEL_SLOT);
+      m_driveVelSMController.setI(0, VEL_SLOT);
 
-      m_driveVelController.setIZone(1, VEL_SLOT);
+      m_driveVelSMController.setIZone(1, VEL_SLOT);
 
     }
 
     else {
 
-      m_driveVelController.setP(1, SIM_SLOT);
+      m_driveVelSMController.setP(1,SIM_SLOT);
 
     }
 
@@ -364,7 +366,7 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
       else {
 
-        m_driveVelController.setReference(state.speedMetersPerSecond, ControlType.kVelocity, VEL_SLOT);
+        m_driveVelSMController.setReference(state.speedMetersPerSecond, ControlType.kVelocity, VEL_SLOT);
 
       }
     }
@@ -373,17 +375,15 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
       SmartDashboard.putNumber("SSPDMPS", state.speedMetersPerSecond);
 
-      // m_driveVelController.setReference(state.speedMetersPerSecond,
-      // ControlType.kVelocity, SIM_SLOT);
+    //  double pidOut = m_driveVelController.calculate(getDriveVelocity(), state.speedMetersPerSecond);
+     // SmartDashboard.putNumber("PIDOUT", pidOut);
+     SmartDashboard.putNumber("DRVEL", getDriveVelocity()/1000);
+     SmartDashboard.putNumber("DRPOS", getDrivePosition());
+      
 
-      double temp = state.speedMetersPerSecond;
+      m_driveMotor.setVoltage(state.speedMetersPerSecond);
 
-      if (DriverStation.isAutonomousEnabled())
-
-        temp = temp / ModuleConstants.kFreeMetersPerSecond;
-        SmartDashboard.putNumber("SSPTMP", temp);
-
-      m_driveMotor.setVoltage(temp * RobotController.getBatteryVoltage());
+     // m_driveMotor.setVoltage(state.speedMetersPerSecond);
       // no simulation for angle - angle command is returned directly to drive
       // subsystem as actual angle in 2 places - getState() and getHeading
 
@@ -479,7 +479,7 @@ public class SwerveModuleSparkMax extends SubsystemBase {
 
       angleDifference = angle - actualAngleDegrees;
 
-      angleIncrementPer20ms = angleDifference / 20;// 10*20ms = .2 sec move time
+      angleIncrementPer20ms = angleDifference / 10;// 10*20ms = .2 sec move time
     }
 
     if (angleIncrementPer20ms != 0) {
