@@ -4,11 +4,17 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DataLogManager;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -21,13 +27,15 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
 
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
 
   public static int lpctra;
+
+  public String logPath = "C:\\Users\\John\\Desktop\\AdvScopeLogs";
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -38,15 +46,31 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // if (RobotBase.isReal())
 
-    //  DataLogManager.start();
+    // DataLogManager.start();
+
+    Logger.getInstance().recordMetadata("BetaSwerve", "2023"); // Set a metadata value
+
+    if (isReal()) {
+      Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+      Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+      // new PowerDistribution(1, ModuleType.kRev); // Enables power distribution
+      // logging
+    } else {
+      setUseTiming(false); // Run as fast as possible
+      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
+      Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save
+                                                                                                          // outputs to
+                                                                                                          // a new log
+    }
+
+    Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may
+                                  // be added.
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
-    
-
   }
 
   /**
@@ -70,13 +94,13 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-   lpctra++;
+    lpctra++;
 
     m_robotContainer.periodic();
 
     m_robotContainer.m_drive.throttleValue = m_robotContainer.getThrottle();
 
-     /*
+    /*
      * Retrieves the temperature of the PDP, in degrees Celsius.
      */
     SmartDashboard.putNumber("Temperature", m_robotContainer.m_pdp.getTemperature());
@@ -92,12 +116,12 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     if (DriverStation.getAlliance() == Alliance.Blue) {
-     // m_robotContainer.m_ls.forceAllianceColor(true);
+      // m_robotContainer.m_ls.forceAllianceColor(true);
 
     }
 
     if (DriverStation.getAlliance() != Alliance.Blue) {
-     // m_robotContainer.m_ls.forceAllianceColor(false);
+      // m_robotContainer.m_ls.forceAllianceColor(false);
 
     }
   }
@@ -132,7 +156,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-  
+
     // new SetSwerveOdometry(m_robotContainer.m_robotDrive,
     // m_robotContainer.m_fieldSim,new Pose2d(6.13, 5.23,
     // Rotation2d.fromDegrees(-41.5))).schedule();
@@ -141,7 +165,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-   // m_robotContainer.m_ls.rainbow();
+    // m_robotContainer.m_ls.rainbow();
   }
 
   @Override
@@ -154,12 +178,12 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
-  //  m_robotContainer.m_ls.lightsaber(true);
+    // m_robotContainer.m_ls.lightsaber(true);
   }
 
   @Override
   public void simulationPeriodic() {
-     m_robotContainer.m_fieldSim.periodic();
+    m_robotContainer.m_fieldSim.periodic();
     m_robotContainer.simulationPeriodic();
   }
 
