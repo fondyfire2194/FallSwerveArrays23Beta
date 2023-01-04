@@ -5,6 +5,7 @@
 package frc.robot.commands.Test;
 
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
@@ -13,16 +14,16 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class MessageShuffleboard extends InstantCommand {
   private String m_message;
-  private int m_value;
-  public MessageShuffleboard(String message, int value) {
+ 
+  public MessageShuffleboard(String message) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_message=message;
-    m_value=value;
+ 
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SmartDashboard.putNumber(m_message,m_value);
+    SmartDashboard.putNumber(m_message,Timer.getFPGATimestamp());
   }
 }
