@@ -102,37 +102,37 @@
     {
       "position": 0.31636363636364007,
       "names": [
-        "shooterStart"
+        "eventone"
       ]
     },
     {
       "position": 0.9163636363636583,
       "names": [
-        "intakeDown"
+        "eventtwo"
       ]
     },
     {
       "position": 1.5163636363636885,
       "names": [
-        "intakeOn"
+        "eventthree"
       ]
     },
     {
       "position": 1.8872727272727827,
       "names": [
-        "intakeOff"
+        "eventfour"
       ]
     },
     {
       "position": 2.1818181818182243,
       "names": [
-        "turnToTarget"
+        "eventfive"
       ]
     },
     {
       "position": 2.7272727272727346,
       "names": [
-        "shoot"
+        "eventsix"
       ]
     }
   ]

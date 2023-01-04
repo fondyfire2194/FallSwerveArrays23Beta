@@ -38,14 +38,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // if (RobotBase.isReal())
 
-    //  DataLogManager.start();
+    DataLogManager.start();
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
-
-    
 
   }
 
@@ -70,13 +68,13 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
 
-   lpctra++;
+    lpctra++;
 
     m_robotContainer.periodic();
 
     m_robotContainer.m_drive.throttleValue = m_robotContainer.getThrottle();
 
-     /*
+    /*
      * Retrieves the temperature of the PDP, in degrees Celsius.
      */
     SmartDashboard.putNumber("Temperature", m_robotContainer.m_pdp.getTemperature());
@@ -92,12 +90,12 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     if (DriverStation.getAlliance() == Alliance.Blue) {
-     // m_robotContainer.m_ls.forceAllianceColor(true);
+      // m_robotContainer.m_ls.forceAllianceColor(true);
 
     }
 
     if (DriverStation.getAlliance() != Alliance.Blue) {
-     // m_robotContainer.m_ls.forceAllianceColor(false);
+      // m_robotContainer.m_ls.forceAllianceColor(false);
 
     }
   }
@@ -110,7 +108,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.m_autoSelect.getAutonomousCommand();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -132,7 +130,7 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-  
+
     // new SetSwerveOdometry(m_robotContainer.m_robotDrive,
     // m_robotContainer.m_fieldSim,new Pose2d(6.13, 5.23,
     // Rotation2d.fromDegrees(-41.5))).schedule();
@@ -141,7 +139,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-   // m_robotContainer.m_ls.rainbow();
+    // m_robotContainer.m_ls.rainbow();
   }
 
   @Override
@@ -154,12 +152,12 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
 
-  //  m_robotContainer.m_ls.lightsaber(true);
+    // m_robotContainer.m_ls.lightsaber(true);
   }
 
   @Override
   public void simulationPeriodic() {
-     m_robotContainer.m_fieldSim.periodic();
+    m_robotContainer.m_fieldSim.periodic();
     m_robotContainer.simulationPeriodic();
   }
 

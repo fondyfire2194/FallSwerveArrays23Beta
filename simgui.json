@@ -12,6 +12,11 @@
       "/SmartDashboard/SetDriverMode2": "Command"
     },
     "windows": {
+      "/SmartDashboard/Auto Selector": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field2d": {
         "Robot": {
           "image": "resources/images/robot.png",

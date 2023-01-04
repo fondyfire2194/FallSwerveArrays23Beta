@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ctre.phoenix.unmanaged.Unmanaged;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
@@ -217,6 +214,7 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Xpos", getX());
     SmartDashboard.putNumber("Ypos", getY());
     SmartDashboard.putNumber("Angle", getHeadingDegrees());
+
 
     if (startTime == 0) {
 
